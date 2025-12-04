@@ -1,12 +1,20 @@
-// ==== КОНСТАНТИ ДЛЯ ЗБЕРЕЖЕННЯ ====
-const STORAGE_PREFIX = "lw_player_";
+// ===============================
+//  The Last Game For Friends
+//  Асинхронна кооперативна стратегія
+//  V1: локальні бази гравців через localStorage
+// ===============================
 
-// ==== ПОТОЧНИЙ СТАН ====
+// Префікс для збережень (щоб не плутатись з іншими іграми)
+const STORAGE_PREFIX = "tlgff_player_";
+
+// Поточний стан
 let currentPlayerName = null;
 let currentPlayerState = null;
 let tickIntervalId = null;
 
-// ==== УТИЛІТИ ====
+// -------------------------------
+// Утиліти
+// -------------------------------
 function $(selector) {
     return document.querySelector(selector);
 }
@@ -22,14 +30,17 @@ function log(message) {
 
     logContainer.prepend(entry);
 
+    // максимум 80 записів
     while (logContainer.children.length > 80) {
         logContainer.removeChild(logContainer.lastChild);
     }
 }
 
-// ==== РОБОТА З "СЕРВЕРОМ" (ПОКИ ЩО localStorage) ====
+// -------------------------------
+// Збереження / завантаження
+// -------------------------------
 
-// Отримати список всіх гравців, що збережені на цьому пристрої
+// Список усіх гравців на цьому пристрої
 function getAllSavedPlayers() {
     const players = [];
     for (let i = 0; i < localStorage.length; i++) {
@@ -42,7 +53,7 @@ function getAllSavedPlayers() {
     return players;
 }
 
-// Завантажити стан гравця або створити новий
+// Завантажити стан гравця або створити нового
 function loadPlayerState(playerName) {
     const key = STORAGE_PREFIX + playerName;
     const raw = localStorage.getItem(key);
@@ -53,7 +64,6 @@ function loadPlayerState(playerName) {
             console.error("Помилка парсингу стану гравця, створюємо новий:", e);
         }
     }
-    // Новий гравець
     return createNewPlayerState(playerName);
 }
 
@@ -63,7 +73,9 @@ function savePlayerState(playerName, state) {
     localStorage.setItem(key, JSON.stringify(state));
 }
 
-// ==== ЛОГІКА ГРИ ====
+// -------------------------------
+// Логіка гри
+// -------------------------------
 
 // Створення нового гравця
 function createNewPlayerState(playerName) {
@@ -105,15 +117,17 @@ function createNewPlayerState(playerName) {
                 name: "Барак",
                 level: 1,
                 type: "barracks",
-                description: "Дає нових виживших з часом."
+                description: "З часом додає нових виживших."
             }
         ]
     };
 }
 
-// ==== РЕНДЕРИНГ ====
+// -------------------------------
+// Рендер
+// -------------------------------
 
-// Список гравців на екрані логіну
+// Список гравців на екрані входу
 function renderSavedPlayers() {
     const container = $("#saved-players");
     if (!container) return;
@@ -122,7 +136,7 @@ function renderSavedPlayers() {
 
     const players = getAllSavedPlayers();
     if (players.length === 0) {
-        container.textContent = "Поки що немає збережених гравців.";
+        container.textContent = "Поки що немає гравців. Створи першого — увійди під своїм ніком.";
         return;
     }
 
@@ -205,7 +219,7 @@ function renderBuildings() {
     });
 }
 
-// Статус бази
+// Статус бази (коротко)
 function renderBaseStatus() {
     const el = $("#base-status");
     if (!el || !currentPlayerState) return;
@@ -215,7 +229,7 @@ function renderBaseStatus() {
 
     el.innerHTML = `
         Рівень штабу: <b>${hq ? hq.level : 1}</b><br>
-        Загальний рівень розвитку бази: <b>${totalLevel}</b>
+        Загальний розвиток бази: <b>${totalLevel}</b>
     `;
 }
 
@@ -240,7 +254,7 @@ function renderOtherPlayers() {
     const allPlayers = getAllSavedPlayers().filter(name => name !== currentPlayerName);
 
     if (allPlayers.length === 0) {
-        container.textContent = "Поки що інших гравців немає. Додай друзів, хай зайдуть під своїми нікнеймами.";
+        container.textContent = "Поки що інших гравців немає. Хай друзі зайдуть під своїми нікнеймами.";
         return;
     }
 
@@ -252,17 +266,21 @@ function renderOtherPlayers() {
     });
 }
 
-// ==== ТІК ГРИ (кожну секунду) ====
+// -------------------------------
+// Тік гри (кожну секунду)
+// -------------------------------
 function gameTick() {
     if (!currentPlayerState) return;
 
     currentPlayerState.timeSeconds++;
 
+    // Новий день кожні 60 секунд
     if (currentPlayerState.timeSeconds % 60 === 0) {
         currentPlayerState.day++;
         log(`Минає день ${currentPlayerState.day} для гравця ${currentPlayerName}.`);
     }
 
+    // Виробництво ресурсів
     currentPlayerState.buildings.forEach(b => {
         if (b.type === "farm") {
             currentPlayerState.resources.food += 1 * b.level;
@@ -280,10 +298,13 @@ function gameTick() {
     renderResources();
     renderTime();
 
+    // автозбереження
     savePlayerState(currentPlayerName, currentPlayerState);
 }
 
-// ==== ДІЇ ====
+// -------------------------------
+// Дії гравця
+// -------------------------------
 function handleAction(action) {
     switch (action) {
         case "upgrade_hq":
@@ -298,6 +319,8 @@ function handleAction(action) {
         case "upgrade_barracks":
             upgradeBuilding("barracks", { food: 30, steel: 20 });
             break;
+        default:
+            break;
     }
 }
 
@@ -305,9 +328,9 @@ function upgradeBuilding(buildingId, cost) {
     if (!currentPlayerState) return;
 
     const building = currentPlayerState.buildings.find(b => b.id === buildingId);
-    const res = currentPlayerState.resources;
-
     if (!building) return;
+
+    const res = currentPlayerState.resources;
 
     if (res.food < cost.food || res.steel < cost.steel) {
         log(`Недостатньо ресурсів, щоб покращити ${building.name}.`);
@@ -323,16 +346,23 @@ function upgradeBuilding(buildingId, cost) {
     renderResources();
     renderBuildings();
     renderBaseStatus();
+
     savePlayerState(currentPlayerName, currentPlayerState);
 }
 
-// ==== ВХІД/ВИХІД ГРАВЦЯ ====
+// -------------------------------
+// Вхід / вихід гравця
+// -------------------------------
 function loginAsPlayer(playerName) {
     if (!playerName) return;
+
     currentPlayerName = playerName;
     currentPlayerState = loadPlayerState(playerName);
 
-    $("#current-player-name").textContent = playerName;
+    const nameEl = $("#current-player-name");
+    if (nameEl) {
+        nameEl.textContent = playerName;
+    }
 
     $("#login-screen").classList.add("screen--hidden");
     $("#game-screen").classList.remove("screen--hidden");
@@ -345,7 +375,9 @@ function loginAsPlayer(playerName) {
 
     log(`Гравець ${playerName} увійшов у гру. База готова до розвитку.`);
 
-    if (tickIntervalId) clearInterval(tickIntervalId);
+    if (tickIntervalId) {
+        clearInterval(tickIntervalId);
+    }
     tickIntervalId = setInterval(gameTick, 1000);
 }
 
@@ -364,13 +396,16 @@ function logoutPlayer() {
     renderSavedPlayers();
 }
 
-// ==== ІНІЦІАЛІЗАЦІЯ ====
+// -------------------------------
+// Ініціалізація
+// -------------------------------
 function init() {
     renderSavedPlayers();
 
     const loginBtn = $("#login-button");
     const nameInput = $("#player-name-input");
     const logoutBtn = $("#logout-button");
+    const actionsContainer = $("#actions");
 
     if (loginBtn && nameInput) {
         loginBtn.addEventListener("click", () => {
@@ -395,11 +430,10 @@ function init() {
         });
     }
 
-    const actionsContainer = $("#actions");
     if (actionsContainer) {
         actionsContainer.addEventListener("click", (e) => {
             const target = e.target;
-            if (target instanceof HTMLButtonElement) {
+            if (target && target.tagName === "BUTTON") {
                 const action = target.getAttribute("data-action");
                 if (action) {
                     handleAction(action);
