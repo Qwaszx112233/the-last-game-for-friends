@@ -1,1 +1,6 @@
-console.log('Base scene ready');
+// Точка входу базової сцени
+window.addEventListener("DOMContentLoaded", () => {
+    loadResources();
+    loadBuildingsState();
+    initBaseUI();
+});
