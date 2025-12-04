@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Last War Mini — База виживших</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Стилі -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="top-bar">
+            <h1>Last War Mini</h1>
+            <div class="top-bar__subtitle">
+                Постапокаліптична база виживших з елементами 4X
+            </div>
+        </header>
+
+        <main class="layout">
+            <!-- Ліва панель: ресурси та час -->
+            <section class="panel panel-left">
+                <h2>Ресурси</h2>
+                <div id="resources">
+                    <!-- Сюди JS вставить значення -->
+                </div>
+
+                <h2>Інформація</h2>
+                <div id="game-info">
+                    День: <span id="day">1</span><br>
+                    Час у грі (сек): <span id="time">0</span>
+                </div>
+            </section>
+
+            <!-- Центр: база та будівлі -->
+            <section class="panel panel-center">
+                <h2>База</h2>
+                <div id="base-layout">
+                    <!-- Тут буде список будівель -->
+                </div>
+            </section>
+
+            <!-- Права панель: герої та дії -->
+            <section class="panel panel-right">
+                <h2>Герої</h2>
+                <div id="heroes">
+                    <!-- Герої поки що простим списком -->
+                </div>
+
+                <h2>Дії</h2>
+                <div id="actions">
+                    <!-- Кнопки дій -->
+                    <button data-action="upgrade_hq">Покращити штаб</button>
+                    <button data-action="upgrade_farm">Покращити ферму</button>
+                    <button data-action="upgrade_oil">Покращити нафтову вишку</button>
+                    <button data-action="upgrade_barracks">Покращити барак</button>
+                </div>
+
+                <h2>Журнал подій</h2>
+                <div id="log" class="log">
+                    <!-- Сюди будемо писати події -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Логіка гри -->
+    <script src="main.js"></script>
+</body>
+</html>
