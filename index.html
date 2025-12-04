@@ -1,90 +1,23 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <title>The Last Game For Friends</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Last Game For Friends</title>
 
-    <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.0/dist/phaser.js"></script>
+
+  <script src="./player.js"></script>
+  <script src="./game.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+    }
+  </style>
 </head>
-<body>
-    <div id="app">
-        <header class="top-bar">
-            <h1>The Last Game For Friends</h1>
-            <div class="top-bar__subtitle">
-                Кооперативна асинхронна 4X-стратегія для тебе та друзів
-            </div>
-        </header>
-
-        <!-- Екран входу -->
-        <section id="login-screen" class="screen">
-            <h2>Вхід у гру</h2>
-            <p class="hint">
-                Введи нікнейм. Для кожного ніка створюється окрема база.
-                Ви з друзями можете грати по черзі на одному пристрої.
-            </p>
-
-            <div class="login-form">
-                <input
-                    id="player-name-input"
-                    type="text"
-                    placeholder="Твій нікнейм (наприклад, Commander_Max)"
-                    autocomplete="off"
-                >
-                <button id="login-button">Увійти</button>
-            </div>
-
-            <h3>Гравці в цьому світі (на цьому пристрої)</h3>
-            <div id="saved-players" class="saved-players"></div>
-        </section>
-
-        <!-- Екран гри -->
-        <section id="game-screen" class="screen screen--hidden">
-            <div class="game-header">
-                <div>
-                    Гравець: <span id="current-player-name"></span><br>
-                    День: <span id="day">1</span>,
-                    Час у грі (сек): <span id="time">0</span>
-                </div>
-                <button id="logout-button" class="logout-button">Змінити гравця</button>
-            </div>
-
-            <main class="layout">
-                <!-- Ліва панель: ресурси -->
-                <section class="panel panel-left">
-                    <h2>Ресурси</h2>
-                    <div id="resources"></div>
-
-                    <h2>Статус бази</h2>
-                    <div id="base-status"></div>
-                </section>
-
-                <!-- Центр: будівлі -->
-                <section class="panel panel-center">
-                    <h2>Будівлі бази</h2>
-                    <div id="base-layout"></div>
-                </section>
-
-                <!-- Права панель: інші гравці, дії, журнал -->
-                <section class="panel panel-right">
-                    <h2>Гравці у цьому світі</h2>
-                    <div id="other-players"></div>
-
-                    <h2>Дії</h2>
-                    <div id="actions">
-                        <button data-action="upgrade_hq">Покращити штаб</button>
-                        <button data-action="upgrade_farm">Покращити ферму</button>
-                        <button data-action="upgrade_oil">Покращити нафтову вишку</button>
-                        <button data-action="upgrade_barracks">Покращити барак</button>
-                    </div>
-
-                    <h2>Журнал подій</h2>
-                    <div id="log" class="log"></div>
-                </section>
-            </main>
-        </section>
-    </div>
-
-    <script src="game.js"></script>
-</body>
+<body></body>
 </html>
