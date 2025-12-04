@@ -1,40 +1,42 @@
+// Куля, летить по прямій до цілі
 class Bullet {
-    constructor(scene, x, y, targetX, targetY) {
+    constructor(scene, x, y, targetX, targetY, speed, damage) {
         this.scene = scene;
+        this.damage = damage;
 
-        // Створюємо кулю — маленьке біле коло
-        this.sprite = scene.add.circle(x, y, 6, 0xffffff);
+        this.sprite = scene.add.circle(x, y, 5, 0xffffff);
         scene.physics.add.existing(this.sprite);
 
-        // Швидкість кулі
-        this.speed = 8;
+        this.speed = speed;
 
-        // Розрахунок напрямку
         const dx = targetX - x;
         const dy = targetY - y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
-        this.velocityX = (dx / dist) * this.speed;
-        this.velocityY = (dy / dist) * this.speed;
+        this.vx = (dx / dist) * this.speed;
+        this.vy = (dy / dist) * this.speed;
+        this.isDestroyed = false;
     }
 
     update() {
-        this.sprite.x += this.velocityX;
-        this.sprite.y += this.velocityY;
+        if (this.isDestroyed) return;
 
-        // Видалити кулю, якщо вона вилетіла за межі
+        this.sprite.x += this.vx;
+        this.sprite.y += this.vy;
+
         if (
-            this.sprite.x < 0 ||
-            this.sprite.x > window.innerWidth ||
-            this.sprite.y < 0 ||
-            this.sprite.y > window.innerHeight
+            this.sprite.x < -50 ||
+            this.sprite.x > window.innerWidth + 50 ||
+            this.sprite.y < -50 ||
+            this.sprite.y > window.innerHeight + 50
         ) {
             this.destroy();
         }
     }
 
     destroy() {
-        this.sprite.destroy();
+        if (this.isDestroyed) return;
         this.isDestroyed = true;
+        this.sprite.destroy();
     }
 }
