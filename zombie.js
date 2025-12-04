@@ -2,11 +2,11 @@ class Zombie {
     constructor(scene, x, y) {
         this.scene = scene;
 
-        // Червоний зомбі-прямокутник
         this.sprite = scene.add.rectangle(x, y, 40, 40, 0xff0000);
         scene.physics.add.existing(this.sprite);
 
-        this.speed = 1.5; // швидкість зомбі
+        this.speed = 1.5;
+        this.hp = 1; // зомбі вмирає від однієї кулі
     }
 
     update(player) {
@@ -17,15 +17,21 @@ class Zombie {
 
         const z = this.sprite;
 
-        // Напрямок руху на гравця
         const dx = px - z.x;
         const dy = py - z.y;
-
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist > 0) {
             z.x += (dx / dist) * this.speed;
             z.y += (dy / dist) * this.speed;
+        }
+    }
+
+    hit() {
+        this.hp -= 1;
+        if (this.hp <= 0) {
+            this.sprite.destroy();
+            this.isDead = true;
         }
     }
 }
