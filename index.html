@@ -2,17 +2,16 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Last War Mini — Асинхронна база</title>
+    <title>The Last Game For Friends</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
         <header class="top-bar">
-            <h1>Last War Mini (Prototype)</h1>
+            <h1>The Last Game For Friends</h1>
             <div class="top-bar__subtitle">
-                Асинхронна 4X-стратегія з базами гравців і зомбі (крок 1)
+                Кооперативна асинхронна 4X-стратегія з базами друзів
             </div>
         </header>
 
@@ -21,14 +20,14 @@
             <h2>Вхід у гру</h2>
             <p class="hint">
                 Введи нікнейм. Для кожного імені буде окрема база.
-                Так ви з друзями можете грати по черзі на одному пристрої.
+                Так ви з друзями можете грати на одному пристрої або з телефону.
             </p>
             <div class="login-form">
-                <input id="player-name-input" type="text" placeholder="Твій нікнейм (наприклад, Командир_Макс)">
+                <input id="player-name-input" type="text" placeholder="Твій нікнейм">
                 <button id="login-button">Увійти</button>
             </div>
 
-            <h3>Збережені гравці на цьому пристрої</h3>
+            <h3>Гравці в цьому світі</h3>
             <div id="saved-players" class="saved-players"></div>
         </section>
 
@@ -59,9 +58,9 @@
                     <div id="base-layout"></div>
                 </section>
 
-                <!-- Права панель: інші гравці, дії, журнал -->
+                <!-- Права панель -->
                 <section class="panel panel-right">
-                    <h2>Інші гравці у світі (на цьому пристрої)</h2>
+                    <h2>Гравці у цьому світі</h2>
                     <div id="other-players"></div>
 
                     <h2>Дії</h2>
@@ -69,16 +68,4 @@
                         <button data-action="upgrade_hq">Покращити штаб</button>
                         <button data-action="upgrade_farm">Покращити ферму</button>
                         <button data-action="upgrade_oil">Покращити нафтову вишку</button>
-                        <button data-action="upgrade_barracks">Покращити барак</button>
-                    </div>
-
-                    <h2>Журнал подій</h2>
-                    <div id="log" class="log"></div>
-                </section>
-            </main>
-        </section>
-    </div>
-
-    <script src="game.js"></script>
-</body>
-</html>
+                        <button data-action="upgrade_barracks">Покращити барак</button>_
