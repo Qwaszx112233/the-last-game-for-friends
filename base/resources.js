@@ -1,0 +1,1 @@
+window.resources={steel:100,energy:50,tech:5,tokens:0};

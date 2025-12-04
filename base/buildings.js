@@ -1,0 +1,1 @@
+window.buildings=[{id:'hq',level:1},{id:'steel',level:1},{id:'energy',level:1}];
