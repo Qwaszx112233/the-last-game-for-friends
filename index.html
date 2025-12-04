@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>The Last Game For Friends</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,7 +12,7 @@
         <header class="top-bar">
             <h1>The Last Game For Friends</h1>
             <div class="top-bar__subtitle">
-                Кооперативна асинхронна 4X-стратегія з базами друзів
+                Кооперативна асинхронна 4X-стратегія для тебе та друзів
             </div>
         </header>
 
@@ -19,15 +20,21 @@
         <section id="login-screen" class="screen">
             <h2>Вхід у гру</h2>
             <p class="hint">
-                Введи нікнейм. Для кожного імені буде окрема база.
-                Так ви з друзями можете грати на одному пристрої або з телефону.
+                Введи нікнейм. Для кожного ніка створюється окрема база.
+                Ви з друзями можете грати по черзі на одному пристрої.
             </p>
+
             <div class="login-form">
-                <input id="player-name-input" type="text" placeholder="Твій нікнейм">
+                <input
+                    id="player-name-input"
+                    type="text"
+                    placeholder="Твій нікнейм (наприклад, Commander_Max)"
+                    autocomplete="off"
+                >
                 <button id="login-button">Увійти</button>
             </div>
 
-            <h3>Гравці в цьому світі</h3>
+            <h3>Гравці в цьому світі (на цьому пристрої)</h3>
             <div id="saved-players" class="saved-players"></div>
         </section>
 
@@ -58,7 +65,7 @@
                     <div id="base-layout"></div>
                 </section>
 
-                <!-- Права панель -->
+                <!-- Права панель: інші гравці, дії, журнал -->
                 <section class="panel panel-right">
                     <h2>Гравці у цьому світі</h2>
                     <div id="other-players"></div>
