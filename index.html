@@ -1,23 +1,45 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Last Game For Friends - Battle Module</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Last Game – Menu</title>
 
-  <link rel="stylesheet" href="./style.css" />
+    <style>
+        body {
+            background: #111;
+            color: white;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            gap: 20px;
+        }
 
-  <!-- Phaser -->
-  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.0/dist/phaser.js"></script>
+        button {
+            padding: 15px 30px;
+            font-size: 20px;
+            background: #1e88e5;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+        }
+        button:hover {
+            background: #42a5f5;
+        }
+    </style>
 
-  <!-- Game config & logic -->
-  <script src="./config.js"></script>
-  <script src="./upgrades.js"></script>
-  <script src="./ui.js"></script>
-  <script src="./bullet.js"></script>
-  <script src="./zombie.js"></script>
-  <script src="./game.js"></script>
 </head>
 <body>
+
+    <h1>The Last Game</h1>
+
+    <button onclick="location.href='base/base.html'">🏠 Enter Base</button>
+    <button onclick="location.href='battle/battle.html'">⚔ Start Mission</button>
+
 </body>
 </html>
