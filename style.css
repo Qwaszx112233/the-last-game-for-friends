@@ -37,6 +37,101 @@ body {
     color: #a0aec0;
 }
 
+.screen {
+    background: #111319;
+    border-radius: 8px;
+    border: 1px solid #23293a;
+    padding: 10px;
+}
+
+.screen--hidden {
+    display: none;
+}
+
+/* Екран логіну */
+#login-screen h2 {
+    margin-bottom: 6px;
+}
+
+.hint {
+    font-size: 13px;
+    color: #a0aec0;
+    margin-bottom: 8px;
+}
+
+.login-form {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.login-form input {
+    flex: 1 1 230px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid #2d3748;
+    background: #050608;
+    color: #e2e8f0;
+}
+
+.login-form button {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #2d3748;
+    background: #1a202c;
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.05s;
+}
+
+.login-form button:hover {
+    background: #2d3748;
+}
+
+.login-form button:active {
+    transform: scale(0.97);
+}
+
+.saved-players {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.saved-player-btn {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #2d3748;
+    background: #151924;
+    color: #e2e8f0;
+    cursor: pointer;
+}
+
+.saved-player-btn:hover {
+    background: #2d3748;
+}
+
+/* Екран гри */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.logout-button {
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid #2d3748;
+    background: #1a202c;
+    color: #e2e8f0;
+    cursor: pointer;
+}
+
 .layout {
     display: grid;
     grid-template-columns: 1.1fr 1.4fr 1.1fr;
@@ -45,7 +140,7 @@ body {
 
 /* Панелі */
 .panel {
-    background: #111319;
+    background: #050608;
     border-radius: 8px;
     border: 1px solid #23293a;
     padding: 10px;
@@ -83,6 +178,11 @@ body {
     font-weight: 600;
 }
 
+#base-status {
+    font-size: 13px;
+    color: #a0aec0;
+}
+
 /* База */
 #base-layout {
     display: flex;
@@ -117,19 +217,19 @@ body {
     color: #a0aec0;
 }
 
-/* Герої */
-#heroes {
+/* Інші гравці */
+#other-players {
+    font-size: 12px;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    font-size: 13px;
 }
 
-.hero {
-    padding: 6px 8px;
+.other-player {
+    padding: 4px 6px;
     border-radius: 6px;
-    background: #151924;
     border: 1px solid #23293a;
+    background: #151924;
 }
 
 /* Дії */
@@ -180,5 +280,11 @@ body {
 @media (max-width: 900px) {
     .layout {
         grid-template-columns: 1fr;
+    }
+
+    .game-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
     }
 }
