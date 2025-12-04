@@ -17,6 +17,7 @@ body {
     padding: 12px;
 }
 
+/* Верхня панель */
 .top-bar {
     display: flex;
     flex-direction: column;
@@ -37,6 +38,7 @@ body {
     color: #a0aec0;
 }
 
+/* Екрани */
 .screen {
     background: #111319;
     border-radius: 8px;
@@ -73,6 +75,11 @@ body {
     border: 1px solid #2d3748;
     background: #050608;
     color: #e2e8f0;
+}
+
+.login-form input:focus {
+    outline: none;
+    border-color: #4299e1;
 }
 
 .login-form button {
@@ -132,6 +139,11 @@ body {
     cursor: pointer;
 }
 
+.logout-button:hover {
+    background: #2d3748;
+}
+
+/* Основний макет */
 .layout {
     display: grid;
     grid-template-columns: 1.1fr 1.4fr 1.1fr;
@@ -183,7 +195,7 @@ body {
     color: #a0aec0;
 }
 
-/* База */
+/* Будівлі */
 #base-layout {
     display: flex;
     flex-direction: column;
