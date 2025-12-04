@@ -6,6 +6,8 @@ let bullets = [];
 let spawnTimer = 0;
 let shootTimer = 0;
 
+let ui;
+
 function initGame() {
     const config = {
         type: Phaser.AUTO,
@@ -23,29 +25,32 @@ function initGame() {
 }
 
 function create() {
-    this.add.text(20, 20, "Auto Shoot Active ✔", {
-        font: "28px Arial",
+    this.add.text(20, 50, "Auto Shoot + XP Active ✔", {
+        font: "24px Arial",
         fill: "#ffffff"
     });
 
-    // Створюємо гравця
+    // Гравець
     player = this.add.rectangle(400, 300, 50, 50, 0x00ff00);
     this.physics.add.existing(player);
 
     cursors = this.input.keyboard.createCursorKeys();
+
+    // XP + Level UI
+    ui = new UI(this);
 }
 
 function update(time) {
     if (!player) return;
 
-    // Рух гравця
+    // --- Рух гравця ---
     const speed = 5;
     if (cursors.left.isDown) player.x -= speed;
     if (cursors.right.isDown) player.x += speed;
     if (cursors.up.isDown) player.y -= speed;
     if (cursors.down.isDown) player.y += speed;
 
-    // --- СПАВН ЗОМБІ ---
+    // --- Спавн зомбі ---
     if (time > spawnTimer) {
         spawnTimer = time + 1500;
 
@@ -55,9 +60,9 @@ function update(time) {
         zombies.push(new Zombie(this, x, y));
     }
 
-    // --- АВТОСТРІЛЬБА ---
+    // --- Автострільба ---
     if (time > shootTimer && zombies.length > 0) {
-        shootTimer = time + 600; // інтервал стрільби
+        shootTimer = time + 600;
 
         const nearest = findNearestZombie();
 
@@ -72,15 +77,15 @@ function update(time) {
         }
     }
 
-    // Оновлюємо кулі
+    // --- Оновлення куль ---
     bullets.forEach((b) => b.update());
     bullets = bullets.filter((b) => !b.isDestroyed);
 
-    // Оновлюємо зомбі
+    // --- Оновлення зомбі ---
     zombies.forEach((z) => z.update(player));
     zombies = zombies.filter((z) => !z.isDead);
 
-    // Перевіряємо зіткнення куль і зомбі
+    // --- Колізії ---
     checkBulletZombieCollision();
 }
 
@@ -111,7 +116,9 @@ function checkBulletZombieCollision() {
 
             if (dist < 30) {
                 bullet.destroy();
-                zombie.hit();
+
+                const killed = zombie.hit();
+                if (killed) ui.addXP(zombie.xpValue);
             }
         });
     });
