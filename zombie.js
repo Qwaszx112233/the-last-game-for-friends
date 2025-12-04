@@ -6,7 +6,8 @@ class Zombie {
         scene.physics.add.existing(this.sprite);
 
         this.speed = 1.5;
-        this.hp = 1; // зомбі вмирає від однієї кулі
+        this.hp = 1;   // Зомбі вмирає від 1 кулі
+        this.xpValue = 1; // Зомбі дає 1 XP
     }
 
     update(player) {
@@ -32,6 +33,8 @@ class Zombie {
         if (this.hp <= 0) {
             this.sprite.destroy();
             this.isDead = true;
+            return true;    // повертаємо сигнал що зомбі вбитий
         }
+        return false;
     }
 }
