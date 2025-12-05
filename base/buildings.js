@@ -3,7 +3,7 @@ const BUILDINGS_KEY = "tlgf_buildings_v1";
 const BUILDING_DEFS = {
   hq: {
     id: "hq",
-    name: "Headquarters",
+    name: "Штаб",
     desc: "Головна будівля бази. Відкриває нові рівні та покращення.",
     maxLevel: 10,
     baseCost: { steel: 0, energy: 0, tech: 0 },
@@ -13,7 +13,7 @@ const BUILDING_DEFS = {
   },
   steelFactory: {
     id: "steelFactory",
-    name: "Steel Factory",
+    name: "Сталеливарня",
     desc: "Виробляє сталь з часом. Чим вищий рівень, тим більше сталі.",
     maxLevel: 10,
     baseCost: { steel: 40, energy: 10, tech: 0 },
@@ -23,7 +23,7 @@ const BUILDING_DEFS = {
   },
   energyGen: {
     id: "energyGen",
-    name: "Energy Generator",
+    name: "Генератор енергії",
     desc: "Генерує енергію для роботи інших будівель.",
     maxLevel: 10,
     baseCost: { steel: 60, energy: 0, tech: 0 },
@@ -33,7 +33,7 @@ const BUILDING_DEFS = {
   },
   heroCenter: {
     id: "heroCenter",
-    name: "Hero Training",
+    name: "Центр героїв",
     desc: "Підготовка героя. Дає додаткові токени для покращень у битві.",
     maxLevel: 10,
     baseCost: { steel: 50, energy: 25, tech: 2 },
@@ -43,7 +43,7 @@ const BUILDING_DEFS = {
   },
   turret: {
     id: "turret",
-    name: "Defense Turret",
+    name: "Оборонна вежа",
     desc: "Захисна вежа. У майбутньому впливатиме на бої проти зомбі.",
     maxLevel: 5,
     baseCost: { steel: 80, energy: 40, tech: 4 },
@@ -53,7 +53,7 @@ const BUILDING_DEFS = {
   },
   warehouse: {
     id: "warehouse",
-    name: "Warehouse",
+    name: "Склад",
     desc: "Склад. Збільшує ліміт зберігання ресурсів (пізніше).",
     maxLevel: 5,
     baseCost: { steel: 70, energy: 20, tech: 2 },

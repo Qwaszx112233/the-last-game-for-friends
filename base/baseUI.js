@@ -37,9 +37,15 @@ function initBaseUI() {
 function onBaseTick() {
   const now = Date.now();
   const changed = updateBuildingUpgrades(now);
+  const upgrading = buildingSlotsEls.some(({ id }) => isBuildingUpgrading(id));
+
   if (changed) {
-    renderBuildingSlots();
-    if (selectedBuildingId) renderPanel(selectedBuildingId);
+    renderResources();
+  }
+
+  if (changed || upgrading) {
+    renderBuildingSlots(now);
+    if (selectedBuildingId) renderPanel(selectedBuildingId, now);
   }
 
   productionTimer += 1;
@@ -66,7 +72,7 @@ function renderResources() {
   resTokensEl.textContent = formatNumberShort(playerResources.tokens);
 }
 
-function renderBuildingSlots() {
+function renderBuildingSlots(now = Date.now()) {
   buildingSlotsEls.forEach(({ el, id }) => {
     const def = BUILDING_DEFS[id];
     if (!def) return;
@@ -83,7 +89,7 @@ function renderBuildingSlots() {
 
     const lvlDiv = document.createElement("div");
     lvlDiv.className = "building-level";
-    lvlDiv.textContent = "Lv. " + lvl;
+    lvlDiv.textContent = "Рів. " + lvl;
 
     card.appendChild(nameDiv);
     card.appendChild(lvlDiv);
@@ -93,10 +99,10 @@ function renderBuildingSlots() {
       const statusDiv = document.createElement("div");
       statusDiv.className = "building-status";
       if (st && st.finishAt) {
-        const remainSec = Math.max(0, Math.ceil((st.finishAt - Date.now()) / 1000));
-        statusDiv.textContent = "Upgrade… " + remainSec + "s";
+        const remainSec = Math.max(0, Math.ceil((st.finishAt - now) / 1000));
+        statusDiv.textContent = "Покращення… " + remainSec + "с";
       } else {
-        statusDiv.textContent = "Upgrade…";
+        statusDiv.textContent = "Покращення…";
       }
       card.appendChild(statusDiv);
     }
@@ -110,7 +116,7 @@ function onBuildingClick(id) {
   renderPanel(id);
 }
 
-function renderPanel(id) {
+function renderPanel(id, now = Date.now()) {
   if (!panelTitleEl || !panelBodyEl) return;
 
   if (!id) {
@@ -139,9 +145,9 @@ function renderPanel(id) {
     html += `<p class="panel-section-title">Наступний рівень</p>`;
     if (cost) {
       html += `<ul class="cost-list">`;
-      if (cost.steel) html += `<li>Steel: <span>${cost.steel}</span></li>`;
-      if (cost.energy) html += `<li>Energy: <span>${cost.energy}</span></li>`;
-      if (cost.tech) html += `<li>Tech: <span>${cost.tech}</span></li>`;
+      if (cost.steel) html += `<li>Сталь: <span>${cost.steel}</span></li>`;
+      if (cost.energy) html += `<li>Енергія: <span>${cost.energy}</span></li>`;
+      if (cost.tech) html += `<li>Технології: <span>${cost.tech}</span></li>`;
       html += `</ul>`;
     }
     html += `<div class="panel-meta">Час побудови: <b>${timeSec}s</b></div>`;
@@ -151,11 +157,11 @@ function renderPanel(id) {
     const st = buildingState[id];
     let remain = "";
     if (st && st.finishAt) {
-      const sec = Math.max(0, Math.ceil((st.finishAt - Date.now()) / 1000));
+      const sec = Math.max(0, Math.ceil((st.finishAt - now) / 1000));
       remain = sec + "s";
     }
     html += `<p class="panel-section-title">Статус</p>`;
-    html += `<p>Upgrade в процесі… ${remain}</p>`;
+    html += `<p>Покращення триває… ${remain}</p>`;
   }
 
   panelBodyEl.innerHTML = html;
@@ -163,7 +169,7 @@ function renderPanel(id) {
   if (lvl < def.maxLevel && !upgrading) {
     const btn = document.createElement("button");
     btn.className = "btn-primary";
-    btn.textContent = "UPGRADE";
+    btn.textContent = "Покращити";
 
     const enough = haveEnoughResources(cost);
     if (!enough) {
