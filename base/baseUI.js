@@ -37,8 +37,13 @@ function initBaseUI() {
 function onBaseTick() {
   const now = Date.now();
   const changed = updateBuildingUpgrades(now);
+  const upgrading = buildingSlotsEls.some(({ id }) => isBuildingUpgrading(id));
+
   if (changed) {
     renderResources();
+  }
+
+  if (changed || upgrading) {
     renderBuildingSlots();
     if (selectedBuildingId) renderPanel(selectedBuildingId);
   }
