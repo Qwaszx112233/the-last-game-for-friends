@@ -1,45 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Last Game – Menu</title>
-
-    <style>
-        body {
-            background: #111;
-            color: white;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            gap: 20px;
-        }
-
-        button {
-            padding: 15px 30px;
-            font-size: 20px;
-            background: #1e88e5;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            color: white;
-        }
-        button:hover {
-            background: #42a5f5;
-        }
-    </style>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Last Game For Friends - Menu</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at top, #25324a 0, #05060b 55%, #000 100%);
+      color: #f5f5ff;
+    }
+    h1 { margin: 0 0 8px; letter-spacing: 0.08em; text-transform: uppercase; }
+    .subtitle { opacity: .75; font-size: 14px; }
+    button {
+      padding: 12px 32px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg,#00e676,#00bfa5);
+      color: #02120b;
+      box-shadow: 0 0 18px rgba(0,230,118,.6);
+      margin: 4px 0;
+    }
+    button.secondary {
+      background: transparent;
+      color: #e0e6ff;
+      border: 1px solid rgba(160,190,255,.7);
+      box-shadow: none;
+    }
+    button:hover { transform: translateY(-1px); }
+    .row { display:flex; flex-direction:column; align-items:center; gap:6px;}
+    .hint { font-size: 12px; opacity:.65; }
+  </style>
 </head>
 <body>
+  <h1>The Last Game For Friends</h1>
+  <div class="subtitle">2D survival + base building (prototype)</div>
 
-    <h1>The Last Game</h1>
+  <div class="row">
+    <button onclick="location.href='battle/battle.html'">Start Mission</button>
+    <div class="hint">Top-down shooter with zombies, XP and upgrades</div>
+  </div>
 
-    <button onclick="location.href='base/base.html'">🏠 Enter Base</button>
-    <button onclick="location.href='battle/battle.html'">⚔ Start Mission</button>
-
+  <div class="row">
+    <button class="secondary" onclick="location.href='base/base.html'">Enter Base</button>
+    <div class="hint">Manage buildings, resources and upgrades</div>
+  </div>
 </body>
 </html>
