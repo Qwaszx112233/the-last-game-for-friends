@@ -37,9 +37,15 @@ function initBaseUI() {
 function onBaseTick() {
   const now = Date.now();
   const changed = updateBuildingUpgrades(now);
+  const upgrading = buildingSlotsEls.some(({ id }) => isBuildingUpgrading(id));
+
   if (changed) {
-    renderBuildingSlots();
-    if (selectedBuildingId) renderPanel(selectedBuildingId);
+    renderResources();
+  }
+
+  if (changed || upgrading) {
+    renderBuildingSlots(now);
+    if (selectedBuildingId) renderPanel(selectedBuildingId, now);
   }
 
   productionTimer += 1;
@@ -66,7 +72,7 @@ function renderResources() {
   resTokensEl.textContent = formatNumberShort(playerResources.tokens);
 }
 
-function renderBuildingSlots() {
+function renderBuildingSlots(now = Date.now()) {
   buildingSlotsEls.forEach(({ el, id }) => {
     const def = BUILDING_DEFS[id];
     if (!def) return;
@@ -93,7 +99,7 @@ function renderBuildingSlots() {
       const statusDiv = document.createElement("div");
       statusDiv.className = "building-status";
       if (st && st.finishAt) {
-        const remainSec = Math.max(0, Math.ceil((st.finishAt - Date.now()) / 1000));
+        const remainSec = Math.max(0, Math.ceil((st.finishAt - now) / 1000));
         statusDiv.textContent = "Upgrade… " + remainSec + "s";
       } else {
         statusDiv.textContent = "Upgrade…";
@@ -110,7 +116,7 @@ function onBuildingClick(id) {
   renderPanel(id);
 }
 
-function renderPanel(id) {
+function renderPanel(id, now = Date.now()) {
   if (!panelTitleEl || !panelBodyEl) return;
 
   if (!id) {
@@ -151,7 +157,7 @@ function renderPanel(id) {
     const st = buildingState[id];
     let remain = "";
     if (st && st.finishAt) {
-      const sec = Math.max(0, Math.ceil((st.finishAt - Date.now()) / 1000));
+      const sec = Math.max(0, Math.ceil((st.finishAt - now) / 1000));
       remain = sec + "s";
     }
     html += `<p class="panel-section-title">Статус</p>`;
