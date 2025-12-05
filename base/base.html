@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Last Game For Friends — База</title>
+  <link rel="stylesheet" href="./base.css" />
+</head>
+<body>
+  <div id="base-root">
+    <div id="top-bar">
+      <div class="res-item">
+        <span class="res-label">Steel</span>
+        <span id="res-steel" class="res-value">0</span>
+      </div>
+      <div class="res-item">
+        <span class="res-label">Energy</span>
+        <span id="res-energy" class="res-value">0</span>
+      </div>
+      <div class="res-item">
+        <span class="res-label">Tech</span>
+        <span id="res-tech" class="res-value">0</span>
+      </div>
+      <div class="res-item">
+        <span class="res-label">⭐ Tokens</span>
+        <span id="res-tokens" class="res-value">0</span>
+      </div>
+    </div>
+
+    <div id="main-layout">
+      <div id="grid-wrapper">
+        <div class="row">
+          <div class="building-slot" data-building-id="hq"></div>
+          <div class="building-slot" data-building-id="steelFactory"></div>
+          <div class="building-slot" data-building-id="energyGen"></div>
+        </div>
+        <div class="row">
+          <div class="building-slot" data-building-id="heroCenter"></div>
+          <div class="building-slot" data-building-id="turret"></div>
+          <div class="building-slot" data-building-id="warehouse"></div>
+        </div>
+      </div>
+
+      <div id="side-panel">
+        <h2 id="panel-title">База</h2>
+        <div id="panel-body">
+          <p>Натисни на будівлю, щоб побачити інформацію та покращити її.</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="bottom-bar">
+      <button id="start-mission-btn">Start Mission</button>
+    </div>
+  </div>
+
+  <script src="./resources.js"></script>
+  <script src="./buildings.js"></script>
+  <script src="./baseUI.js"></script>
+  <script src="./baseScene.js"></script>
+</body>
+</html>
