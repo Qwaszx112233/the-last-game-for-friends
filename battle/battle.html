@@ -27,8 +27,10 @@
 
 <div id="levelUpText"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+<!-- IMPORTANT: Use non-minified Phaser, CSP safe -->
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
 
+<!-- UI must load BEFORE game.js -->
 <script src="ui.js"></script>
 <script src="game.js"></script>
 
