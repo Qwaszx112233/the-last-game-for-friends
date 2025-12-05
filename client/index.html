@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Last Game For Friends</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #111;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #game-canvas {
+            border: 2px solid #333;
+            background: #000;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        #loading-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        
+        .ui-panel {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="loading-screen">
+            <h1>The Last Game For Friends</h1>
+            <p>Загрузка игры...</p>
+            <div id="progress-bar" style="width: 300px; height: 20px; background: #333; margin: 20px auto;">
+                <div id="progress" style="width: 0%; height: 100%; background: #4CAF50;"></div>
+            </div>
+        </div>
+        
+        <canvas id="game-canvas" class="hidden"></canvas>
+        
+        <div id="ui" class="hidden">
+            <div class="ui-panel">
+                <div>Здоровье: <span id="health">100</span>/100</div>
+                <div>Патроны: <span id="ammo">30</span></div>
+            </div>
+            <div class="ui-panel">
+                <div>Игроки онлайн: <span id="online-count">1</span></div>
+                <div>Зомби: <span id="zombie-count">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="game.js"></script>
+    <script src="network.js"></script>
+</body>
+</html>

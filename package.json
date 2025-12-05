@@ -1,0 +1,23 @@
+{
+  "name": "the-last-game-for-friends",
+  "version": "1.0.0",
+  "description": "Кооперативная игра про выживание с друзьями",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "client": "live-server client/"
+  },
+  "keywords": ["game", "multiplayer", "survival"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "live-server": "^1.2.2"
+  }
+}
