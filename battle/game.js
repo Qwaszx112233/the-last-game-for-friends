@@ -24,11 +24,11 @@ class BattleScene extends Phaser.Scene {
       hp: this.player.state.hp,
       maxHp: this.player.state.maxHp,
       xp: 0,
+      totalXP: 0,
       xpToNext: 5,
       level: 1,
       wave: 1,
       kills: 0,
-      totalXP: 0,
       takenUpgrades: new Set()
     };
 
