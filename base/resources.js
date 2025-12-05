@@ -53,15 +53,11 @@ function spendResources(cost) {
   return true;
 }
 
-function formatNumberShort(n) {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
-  if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
-  return String(n);
-}
+const LAST_BATTLE_KEY = "tlgf_lastBattle_v1";
 
 function applyLastBattleResult() {
   try {
-    const raw = localStorage.getItem("tlgf_lastBattle_v1");
+    const raw = localStorage.getItem(LAST_BATTLE_KEY);
     if (!raw) return;
     const data = JSON.parse(raw);
 
@@ -86,8 +82,14 @@ function applyLastBattleResult() {
       tokens: tokensGain
     });
 
-    localStorage.removeItem("tlgf_lastBattle_v1");
+    localStorage.removeItem(LAST_BATTLE_KEY);
   } catch (e) {
     console.warn("applyLastBattleResult failed:", e);
   }
+}
+
+function formatNumberShort(n) {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
+  return String(n);
 }
