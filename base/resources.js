@@ -53,13 +53,15 @@ function spendResources(cost) {
   return true;
 }
 
-
-
-const LAST_BATTLE_KEY = "tlgf_lastBattle_v1";
+function formatNumberShort(n) {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
+  return String(n);
+}
 
 function applyLastBattleResult() {
   try {
-    const raw = localStorage.getItem(LAST_BATTLE_KEY);
+    const raw = localStorage.getItem("tlgf_lastBattle_v1");
     if (!raw) return;
     const data = JSON.parse(raw);
 
@@ -67,15 +69,10 @@ function applyLastBattleResult() {
     const kills = Number(data.kills) || 0;
     const wave = Number(data.wave) || 1;
 
-    // Simple reward formula:
-    //  - tokens: 1 per 5 XP (minimum 1 if any XP)
-    //  - steel: +1 per kill
-    //  - energy: ~half of final wave
-    //  - tech: +1 per 5 waves
     let tokensGain = 0;
     if (xp > 0) {
       tokensGain = Math.floor(xp / 5);
-      if (tokensGain <= 0) tokensGain = 1;
+      if (tokensGain < 1) tokensGain = 1;
     }
 
     const steelGain = kills;
@@ -89,14 +86,8 @@ function applyLastBattleResult() {
       tokens: tokensGain
     });
 
-    localStorage.removeItem(LAST_BATTLE_KEY);
+    localStorage.removeItem("tlgf_lastBattle_v1");
   } catch (e) {
     console.warn("applyLastBattleResult failed:", e);
   }
-}
-
-function formatNumberShort(n) {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
-  if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
-  return String(n);
 }
