@@ -1,1 +1,0 @@
-// shared constants between base and battle\n
