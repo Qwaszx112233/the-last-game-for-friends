@@ -1,24 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Last Game – Battle</title>
-
-    <link rel="stylesheet" href="style.css">
-
-    <!-- PHASER -->
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
-
-    <!-- BATTLE MODULES -->
-    <script src="config.js" defer></script>
-    <script src="player.js" defer></script>
-    <script src="bullet.js" defer></script>
-    <script src="zombie.js" defer></script>
-    <script src="upgrades.js" defer></script>
-    <script src="ui.js" defer></script>
-    <script src="game.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Last Game For Friends - Battle</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.js"></script>
 </head>
 <body>
+  <div id="game-container"></div>
+
+  <div class="hud">
+    <div class="hud-left">
+      <div>HP: <span id="hp-text">5 / 5</span></div>
+      <div class="bar">
+        <div id="xp-bar" class="bar-fill"></div>
+      </div>
+      <div>Lv: <span id="level-text">1</span></div>
+    </div>
+    <div class="hud-right">
+      <div>Wave: <span id="wave-text">1</span></div>
+      <div>Kills: <span id="kills-text">0</span></div>
+    </div>
+  </div>
+
+  <div id="levelup-overlay">
+    <div class="levelup-panel">
+      <div class="levelup-title">Level up! Choose an upgrade</div>
+      <div id="levelup-cards" class="levelup-cards"></div>
+    </div>
+  </div>
+
+  <div id="gameover-overlay">
+    <div class="gameover-panel">
+      <h2>Mission Failed</h2>
+      <div class="gameover-stats">
+        Wave: <span id="go-wave"></span><br/>
+        Kills: <span id="go-kills"></span><br/>
+        Level: <span id="go-level"></span>
+      </div>
+      <div class="gameover-actions">
+        <button class="primary" onclick="location.reload()">Retry</button>
+        <button class="secondary" onclick="location.href='../base/base.html'">Back to Base</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="upgrades.js"></script>
+  <script src="ui.js"></script>
+  <script src="player.js"></script>
+  <script src="bullet.js"></script>
+  <script src="zombie.js"></script>
+  <script src="game.js"></script>
 </body>
 </html>
