@@ -1,104 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Last Game For Friends — Battle</title>
-
+    <meta charset="UTF-8">
+    <title>Battle</title>
     <style>
-        html, body {
+        body {
             margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #0d1117;
-            font-family: "Inter", sans-serif;
+            background: #0e0e0e;
         }
-        #game-container {
-            width: 100%;
-            height: 100%;
-        }
-        #upgrade-overlay {
+
+        #levelUpText {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 14, 22, 0.68);
-            backdrop-filter: blur(4px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-        }
-        #upgrade-panel {
-            background: linear-gradient(180deg, #1b2333, #111621);
-            border: 1px solid #3d4d6a;
-            border-radius: 14px;
-            padding: 22px 26px;
-            width: 88%;
-            max-width: 680px;
-            box-shadow: 0 0 12px rgba(40, 120, 255, 0.35);
-            color: white;
-            text-align: center;
-        }
-        #upgrade-title {
-            font-size: 20px;
-            margin-bottom: 16px;
-            font-weight: 600;
-            color: #dce4f3;
-        }
-        #upgrade-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-            justify-content: center;
-        }
-        .upgrade-card {
-            background: #141a25;
-            border: 1px solid #2b3445;
-            border-radius: 10px;
-            width: 190px;
-            padding: 14px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .upgrade-card:hover {
-            border-color: #3ea6ff;
-            box-shadow: 0 0 10px rgba(80, 150, 255, 0.4);
-            transform: translateY(-3px);
-        }
-        .upgrade-name {
-            font-size: 17px;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-        .upgrade-desc {
-            font-size: 14px;
-            opacity: 0.75;
+            top: 20px;
+            left: 20px;
+            color: #00ff00;
+            font-size: 24px;
+            font-family: Arial;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
     </style>
-
-    <script src="phaser.min.js"></script>
-    <script src="config.js"></script>
-    <script src="player.js"></script>
-    <script src="bullet.js"></script>
-    <script src="zombie.js"></script>
-    <script src="upgrades.js"></script>
-    <script src="ui.js"></script>
-    <script src="game.js"></script>
 </head>
-
 <body>
-    <div id="game-container"></div>
 
-    <div id="upgrade-overlay">
-        <div id="upgrade-panel">
-            <div id="upgrade-title">Level Up! Choose an Upgrade</div>
-            <div id="upgrade-options"></div>
-        </div>
-    </div>
+<div id="levelUpText"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+
+<!-- UI must load BEFORE game.js -->
+<script src="ui.js"></script>
+
+<script src="game.js"></script>
 
 </body>
 </html>

@@ -1,11 +1,9 @@
-// ui.js — Полностью рабочий UI для Battle Scene
+// ui.js — Полный рабочий файл UI без модулей
 
-export class BattleUI {
+class BattleUI {
     constructor() {
-        // ищем элементы
         this.levelUpText = document.getElementById("levelUpText");
 
-        // если элемента нет — создаём автоматически
         if (!this.levelUpText) {
             this.levelUpText = document.createElement("div");
             this.levelUpText.id = "levelUpText";
@@ -17,28 +15,28 @@ export class BattleUI {
             this.levelUpText.style.fontFamily = "Arial";
             this.levelUpText.style.pointerEvents = "none";
             this.levelUpText.style.zIndex = "9999";
+            this.levelUpText.style.opacity = "0";
+            this.levelUpText.style.transition = "opacity 0.5s";
+
             document.body.appendChild(this.levelUpText);
         }
 
-        // скрываем по умолчанию
         this.hideLevelUp();
     }
 
     showLevelUp(level) {
-        if (!this.levelUpText) return;
-
         this.levelUpText.innerHTML = "LEVEL UP! → " + level;
         this.levelUpText.style.opacity = "1";
 
-        // мягкое исчезновение
         setTimeout(() => {
             this.hideLevelUp();
         }, 1500);
     }
 
     hideLevelUp() {
-        if (this.levelUpText) {
-            this.levelUpText.style.opacity = "0";
-        }
+        this.levelUpText.style.opacity = "0";
     }
 }
+
+// Делаем глобальным
+window.BattleUI = BattleUI;
