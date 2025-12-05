@@ -1,50 +1,78 @@
+// server/server.js
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
-});
+const io = socketIo(server);
 
+// Порт сервера
 const PORT = process.env.PORT || 3000;
 
-// Статика для клиента
-app.use(express.static('../client'));
+// Простые константы (чтобы не тянуть shared/constants на этом этапе)
+const PLAYER_HEALTH = 100;
+const SOCKET_EVENTS = {
+    PLAYER_MOVE: 'player_move',
+    GAME_STATE: 'game_state',
+    PLAYER_JOINED: 'player_joined',
+    PLAYER_LEFT: 'player_left'
+};
 
-// Основной маршрут
+// Раздаём клиентские файлы из папки client
+app.use(express.static(path.join(__dirname, '../client')));
+
+// Главная страница
 app.get('/', (req, res) => {
-    res.sendFile('index.html', { root: '../client' });
+    res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
-// Подключение WebSocket
+// Список игроков в памяти сервера
+const players = {};
+
+// Подключение нового клиента
 io.on('connection', (socket) => {
-    console.log('Новый игрок подключился:', socket.id);
+    console.log('Игрок подключился:', socket.id);
 
-    socket.on('player_join', (playerData) => {
-        console.log('Игрок присоединился:', playerData);
-        // Логика присоединения игрока
+    // Создаём запись о новом игроке
+    players[socket.id] = {
+        id: socket.id,
+        x: 200,
+        y: 200,
+        hp: PLAYER_HEALTH
+    };
+
+    // Сообщаем всем, что игрок присоединился
+    io.emit(SOCKET_EVENTS.PLAYER_JOINED, players[socket.id]);
+
+    // Обработка движения игрока
+    socket.on(SOCKET_EVENTS.PLAYER_MOVE, (data) => {
+        const player = players[socket.id];
+        if (!player) return;
+
+        if (typeof data.x === 'number') player.x = data.x;
+        if (typeof data.y === 'number') player.y = data.y;
     });
 
-    socket.on('player_move', (movement) => {
-        // Логика движения игрока
-        io.emit('player_moved', {
-            playerId: socket.id,
-            movement
-        });
-    });
-
+    // Отключение игрока
     socket.on('disconnect', () => {
-        console.log('Игрок отключился:', socket.id);
-        // Логика удаления игрока
+        console.log('Игрок вышел:', socket.id);
+        delete players[socket.id];
+
+        io.emit(SOCKET_EVENTS.PLAYER_LEFT, socket.id);
     });
 });
 
+// Периодическая рассылка общего состояния игры (10 раз в секунду)
+setInterval(() => {
+    io.emit(SOCKET_EVENTS.GAME_STATE, {
+        players
+    });
+}, 100);
+
+// Запуск сервера
 server.listen(PORT, () => {
-    console.log(`Сервер запущен на порту ${PORT}`);
-    console.log(`Откройте http://localhost:${PORT} в браузере`);
+    console.log(`Сервер запущен: http://localhost:${PORT}`);
 });
