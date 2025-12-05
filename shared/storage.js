@@ -1,1 +1,1 @@
-// Stage1 storage.js
+// shared storage helpers will live here later\n
