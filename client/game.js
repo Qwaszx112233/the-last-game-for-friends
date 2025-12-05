@@ -1,199 +1,163 @@
 // client/game.js
 
-// Глобальный объект для клавиш
 const keys = {};
-window.addEventListener('keydown', (e) => {
-    keys[e.key.toLowerCase()] = true;
-});
-window.addEventListener('keyup', (e) => {
-    keys[e.key.toLowerCase()] = false;
-});
+window.addEventListener('keydown', (e) => keys[e.key.toLowerCase()] = true);
+window.addEventListener('keyup', (e) => keys[e.key.toLowerCase()] = false);
 
-// Инициализируем Socket.IO-клиент
 const socket = io();
 
-// Простая основная сцена
 class MainScene {
     constructor(game) {
         this.game = game;
-        this.players = {};
+
+        this.players = {};     // данные от сервера
+        this.renderPlayers = {}; // данные для отображения (интерполяция)
+
         this.playerId = null;
         this.speed = 4;
+
         this.onlineCounter = document.getElementById('online-count');
     }
 
     init() {
-        // Подключение к серверу
         socket.on('connect', () => {
-            console.log('Подключено к серверу, мой ID:', socket.id);
             this.playerId = socket.id;
+            console.log("Мой ID:", this.playerId);
         });
 
-        // Получение состояния игры
         socket.on('game_state', (state) => {
-            this.players = state.players || {};
+            const serverPlayers = state.players || {};
+
+            // Обновляем список игроков
+            for (const id in serverPlayers) {
+                const sp = serverPlayers[id];
+
+                if (!this.renderPlayers[id]) {
+                    this.renderPlayers[id] = {
+                        renderX: sp.x,
+                        renderY: sp.y,
+                        serverX: sp.x,
+                        serverY: sp.y
+                    };
+                }
+
+                // Обновляем серверные координаты
+                this.renderPlayers[id].serverX = sp.x;
+                this.renderPlayers[id].serverY = sp.y;
+            }
+
+            // Удаляем игроков, которые вышли
+            for (const id in this.renderPlayers) {
+                if (!serverPlayers[id]) delete this.renderPlayers[id];
+            }
+
+            this.players = serverPlayers;
             this.updateUi();
         });
-
-        // Игрок присоединился
-        socket.on('player_joined', (player) => {
-            console.log('Игрок вошёл:', player.id);
-            // Можно добавить анимацию появления и т.п.
-        });
-
-        // Игрок вышел
-        socket.on('player_left', (id) => {
-            console.log('Игрок вышел:', id);
-        });
     }
 
-    resize(width, height) {
-        // Пока ничего не делаем — можно добавить камеру/масштабирование
-    }
+    resize() {}
 
-    destroy() {
-        // Если нужно, можно отписаться от событий socket.off(...)
-    }
+    destroy() {}
 
     update() {
         if (!this.playerId) return;
+
         const me = this.players[this.playerId];
         if (!me) return;
 
         let moved = false;
 
-        if (keys['w'] || keys['arrowup']) {
-            me.y -= this.speed;
-            moved = true;
-        }
-        if (keys['s'] || keys['arrowdown']) {
-            me.y += this.speed;
-            moved = true;
-        }
-        if (keys['a'] || keys['arrowleft']) {
-            me.x -= this.speed;
-            moved = true;
-        }
-        if (keys['d'] || keys['arrowright']) {
-            me.x += this.speed;
-            moved = true;
-        }
+        if (keys['w'] || keys['arrowup']) { me.y -= this.speed; moved = true; }
+        if (keys['s'] || keys['arrowdown']) { me.y += this.speed; moved = true; }
+        if (keys['a'] || keys['arrowleft']) { me.x -= this.speed; moved = true; }
+        if (keys['d'] || keys['arrowright']) { me.x += this.speed; moved = true; }
 
         if (moved) {
             socket.emit('player_move', { x: me.x, y: me.y });
         }
+
+        // Интерполяция всех игроков для гладкости
+        for (const id in this.renderPlayers) {
+            const rp = this.renderPlayers[id];
+
+            rp.renderX += (rp.serverX - rp.renderX) * 0.2;
+            rp.renderY += (rp.serverY - rp.renderY) * 0.2;
+        }
     }
 
     render(ctx) {
-        for (const id in this.players) {
-            const p = this.players[id];
+        ctx.clearRect(0, 0, this.game.canvas.width, this.game.canvas.height);
 
-            // Цвет: зелёный — ты, красный — другие
-            ctx.fillStyle = id === this.playerId ? 'lime' : 'red';
-            ctx.fillRect(p.x, p.y, 20, 20);
+        for (const id in this.renderPlayers) {
+            const p = this.renderPlayers[id];
+
+            ctx.fillStyle = id === this.playerId ? "lime" : "red";
+            ctx.fillRect(p.renderX, p.renderY, 20, 20);
         }
     }
 
     updateUi() {
-        if (this.onlineCounter) {
-            this.onlineCounter.textContent = Object.keys(this.players).length.toString();
-        }
+        this.onlineCounter.textContent = Object.keys(this.players).length;
     }
 }
 
-// Класс Game — твой основной менеджер
 class Game {
     constructor() {
         this.canvas = document.getElementById('game-canvas');
         this.ctx = this.canvas.getContext('2d');
+
         this.loadingScreen = document.getElementById('loading-screen');
         this.gameContainer = document.getElementById('game-container');
         this.ui = document.getElementById('ui');
-        
+
         this.scenes = {};
         this.currentScene = null;
-        
+
         this.init();
     }
-    
+
     init() {
         this.resize();
         window.addEventListener('resize', () => this.resize());
-        
-        // Загрузка сцен
+
         this.loadScenes();
-        
-        // Начало игрового цикла
         this.gameLoop();
-        
-        console.log('Игра инициализирована');
     }
-    
+
     resize() {
-        const width = this.gameContainer.clientWidth;
-        const height = this.gameContainer.clientHeight;
-        
-        this.canvas.width = width;
-        this.canvas.height = height;
-        
-        if (this.currentScene && this.currentScene.resize) {
-            this.currentScene.resize(width, height);
-        }
+        this.canvas.width = this.gameContainer.clientWidth;
+        this.canvas.height = this.gameContainer.clientHeight;
     }
-    
+
     loadScenes() {
-        console.log('Загрузка сцен...');
-
-        // Регистрируем основную сцену
-        this.scenes['main'] = new MainScene(this);
-
-        // Активируем её
-        this.setScene('main');
-
-        // Прячем экран загрузки, показываем канвас
+        this.scenes["main"] = new MainScene(this);
+        this.setScene("main");
         this.hideLoadingScreen();
     }
-    
-    setScene(sceneName) {
-        if (this.currentScene && this.currentScene.destroy) {
-            this.currentScene.destroy();
-        }
-        
-        this.currentScene = this.scenes[sceneName];
-        if (this.currentScene && this.currentScene.init) {
-            this.currentScene.init();
-            this.ui.classList.remove('hidden');
-        }
+
+    setScene(name) {
+        if (this.currentScene?.destroy) this.currentScene.destroy();
+
+        this.currentScene = this.scenes[name];
+        this.currentScene.init();
+
+        this.ui.classList.remove("hidden");
     }
-    
+
     gameLoop() {
-        // Очистка холста
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Обновление и отрисовка текущей сцены
-        if (this.currentScene) {
-            if (this.currentScene.update) this.currentScene.update();
-            if (this.currentScene.render) this.currentScene.render(this.ctx);
-        }
-        
-        // Следующий кадр
+        this.currentScene.update();
+        this.currentScene.render(this.ctx);
+
         requestAnimationFrame(() => this.gameLoop());
     }
-    
-    showLoadingScreen() {
-        this.loadingScreen.classList.remove('hidden');
-        this.canvas.classList.add('hidden');
-        this.ui.classList.add('hidden');
-    }
-    
+
     hideLoadingScreen() {
-        this.loadingScreen.classList.add('hidden');
-        this.canvas.classList.remove('hidden');
-        // UI показываем при активации сцены (в setScene)
+        this.loadingScreen.classList.add("hidden");
+        this.canvas.classList.remove("hidden");
     }
 }
 
-// Запуск игры при загрузке страницы
-window.addEventListener('load', () => {
+window.addEventListener("load", () => {
     window.game = new Game();
 });
