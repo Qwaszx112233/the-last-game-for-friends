@@ -23,7 +23,6 @@ html, body {
   gap: 10px;
 }
 
-/* Top resources bar */
 #top-bar {
   display: flex;
   align-items: center;
@@ -55,7 +54,6 @@ html, body {
   font-size: 14px;
 }
 
-/* Main layout */
 #main-layout {
   flex: 1;
   display: grid;
@@ -64,7 +62,6 @@ html, body {
   min-height: 0;
 }
 
-/* Grid with buildings */
 #grid-wrapper {
   padding: 12px;
   border-radius: 16px;
@@ -125,7 +122,6 @@ html, body {
   color: #ffda7a;
 }
 
-/* Side panel */
 #side-panel {
   border-radius: 16px;
   background: linear-gradient(145deg, rgba(8, 12, 26, 0.98), rgba(16, 22, 46, 0.98));
@@ -176,7 +172,6 @@ html, body {
   margin-top: 8px;
 }
 
-/* Buttons */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -200,20 +195,6 @@ html, body {
   box-shadow: none;
 }
 
-.btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(160, 190, 255, 0.65);
-  background: transparent;
-  color: #e4ebff;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-/* Bottom bar */
 #bottom-bar {
   display: flex;
   justify-content: center;
