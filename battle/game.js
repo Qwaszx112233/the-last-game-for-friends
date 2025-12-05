@@ -1,203 +1,168 @@
+// The Last Game For Friends — game.js (Stage 2.0 Last War Edition)
+
 class BattleScene extends Phaser.Scene {
-  constructor() {
-    super("battle");
-  }
+    constructor() {
+        super({ key: "BattleScene" });
 
-  preload() {}
+        this.state = {
+            xp: 0,
+            totalXP: 0,
+            xpToNext: 5,
+            level: 1,
+            wave: 1,
+            kills: 0,
+            isPaused: false
+        };
 
-  create() {
-    this.physics.world.setBounds(0, 0, GAME_WIDTH, GAME_HEIGHT);
-    this.add.rectangle(GAME_WIDTH/2, GAME_HEIGHT/2, GAME_WIDTH, GAME_HEIGHT, 0x050812);
-
-    this.player = new Player(this, GAME_WIDTH/2, GAME_HEIGHT/2);
-
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.cursors.w = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-    this.cursors.a = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-    this.cursors.s = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-    this.cursors.d = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-
-    this.bullets = createBulletGroup(this);
-    this.zombies = createZombieGroup(this);
-
-    this.state = {
-      hp: this.player.state.hp,
-      maxHp: this.player.state.maxHp,
-      xp: 0,
-      xpToNext: 5,
-      level: 1,
-      wave: 1,
-      kills: 0,
-      totalXP: 0,
-      takenUpgrades: new Set()
-    };
-
-    this.ui = new BattleUI();
-    this.ui.updateStats(this.state);
-
-    this.lastSpawnAt = 0;
-    this.isPausedForLevel = false;
-    this.isGameOver = false;
-
-    this.physics.add.overlap(this.bullets, this.zombies, (bullet, zombie) => {
-      bullet.setActive(false);
-      bullet.setVisible(false);
-      bullet.body.stop();
-      if (zombie.hit(bullet.damage)) {
-        this.state.kills += 1;
-        this.addXP(1);
-      }
-      this.ui.updateStats(this.state);
-    });
-
-    this.physics.add.overlap(this.player.sprite, this.zombies, () => {
-      if (this.isGameOver || this.isPausedForLevel) return;
-      this.player.takeDamage(1);
-      this.state.hp = this.player.state.hp;
-      this.ui.updateStats(this.state);
-      if (this.player.isDead()) {
-        this.endGame();
-      }
-    });
-  }
-
-  addXP(amount) {
-    this.state.xp += amount;
-    this.state.totalXP += amount;
-    if (this.state.xp >= this.state.xpToNext) {
-      this.state.level += 1;
-      this.state.xp -= this.state.xpToNext;
-      this.state.xpToNext = Math.round(this.state.xpToNext * 1.4 + 2);
-      this.levelUp();
-    }
-  }
-
-  levelUp() {
-    this.isPausedForLevel = true;
-    this.physics.world.isPaused = true;
-
-    const choices = pickRandomUpgrades(3, this.state.takenUpgrades);
-
-    this.ui.showLevelUp(choices, (picked) => {
-      picked.apply(this.player.state);
-      this.player.state.hp = Math.min(this.player.state.hp, this.player.state.maxHp);
-      this.state.hp = this.player.state.hp;
-      this.state.maxHp = this.player.state.maxHp;
-      this.state.takenUpgrades.add(picked.id);
-      this.ui.updateStats(this.state);
-
-      this.isPausedForLevel = false;
-      this.physics.world.isPaused = false;
-    });
-  }
-
-  spawnZombie() {
-    const margin = 20;
-    const side = Math.floor(Math.random() * 4);
-    let x, y;
-    if (side === 0) { // top
-      x = Math.random() * GAME_WIDTH;
-      y = -margin;
-    } else if (side === 1) { // bottom
-      x = Math.random() * GAME_WIDTH;
-      y = GAME_HEIGHT + margin;
-    } else if (side === 2) { // left
-      x = -margin;
-      y = Math.random() * GAME_HEIGHT;
-    } else { // right
-      x = GAME_WIDTH + margin;
-      y = Math.random() * GAME_HEIGHT;
+        this.spawnTimer = 0;
+        this.spawnInterval = 1100; // ms dynamic
+        this.waveActive = true;
+        this.waveEnemyCount = 0;
+        this.waveKilled = 0;
     }
 
-    const z = this.zombies.get(x, y);
-    if (!z) return;
-    z.setActive(true);
-    z.setVisible(true);
-    z.hp = ZOMBIE_HP + (this.state.wave - 1);
-  }
+    preload() {}
 
-  update(time, delta) {
-    if (this.isGameOver) return;
-    const dt = delta / 1000;
+    create() {
+        this.player = new Player(this, 400, 300);
+        this.zombies = createZombieGroup(this);
 
-    this.player.handleMovement(this.cursors, dt);
+        this.time.addEvent({
+            delay: 1000,
+            callback: () => this.startWave(),
+            loop: false
+        });
 
-    // Move zombies toward player
-    this.zombies.children.iterate((z) => {
-      if (!z.active) return;
-      const dx = this.player.sprite.x - z.x;
-      const dy = this.player.sprite.y - z.y;
-      const len = Math.hypot(dx, dy) || 1;
-      const speed = ZOMBIE_BASE_SPEED + (this.state.wave - 1) * 4;
-      z.body.setVelocity((dx/len)*speed, (dy/len)*speed);
-    });
+        this.physics.add.collider(this.player.sprite, this.zombies, (p, z) => {
+            this.player.hit(1);
+        });
 
-    // Spawn zombies
-    if (!this.isPausedForLevel && time - this.lastSpawnAt > ZOMBIE_SPAWN_INTERVAL) {
-      this.lastSpawnAt = time;
-      for (let i = 0; i < this.state.wave; i++) {
-        this.spawnZombie();
-      }
-      this.state.wave += 1;
-      this.ui.updateStats(this.state);
+        this.ui = new BattleUI(this);
     }
 
-    // Find nearest zombie
-    let nearest = null;
-    let bestDist = Infinity;
-    this.zombies.children.iterate((z) => {
-      if (!z.active) return;
-      const dx = z.x - this.player.sprite.x;
-      const dy = z.y - this.player.sprite.y;
-      const d2 = dx*dx + dy*dy;
-      if (d2 < bestDist) {
-        bestDist = d2;
-        nearest = z;
-      }
-    });
+    startWave() {
+        this.waveActive = true;
+        this.waveKilled = 0;
 
-    this.player.tryAutoShoot(nearest, this.bullets, time);
-  }
+        const wave = this.state.wave;
 
-  saveBattleResult(reason = "death") {
-    try {
-      const xp = this.state.totalXP || 0;
-      const data = {
-        reason,
-        xp,
-        kills: this.state.kills,
-        wave: this.state.wave,
-        savedAt: Date.now()
-      };
-      localStorage.setItem("tlgf_lastBattle_v1", JSON.stringify(data));
-    } catch (e) {
-      console.warn("Cannot save battle result:", e);
+        // Dynamic spawn interval
+        if (wave < 4) this.spawnInterval = 1100;
+        else if (wave < 7) this.spawnInterval = 900;
+        else if (wave < 10) this.spawnInterval = 750;
+        else this.spawnInterval = 600;
+
+        // Enemy count
+        this.waveEnemyCount = 20 + wave * 3;
+
+        // Add miniboss every 5 waves
+        if (wave % 5 === 0) {
+            this.spawnZombie("miniboss");
+        }
     }
-  }
 
-  endGame() {
-    this.isGameOver = true;
-    this.physics.world.isPaused = true;
-    this.saveBattleResult("death");
-    this.ui.showGameOver(this.state);
-  }
+    spawnZombie(typeOverride = null) {
+        const wave = this.state.wave;
+
+        let t = "walker";
+        if (!typeOverride) {
+            const r = Math.random();
+
+            if (wave < 4) {
+                if (r < 0.9) t = "walker";
+                else t = "runner";
+            } else if (wave < 7) {
+                if (r < 0.7) t = "walker";
+                else if (r < 0.9) t = "runner";
+                else t = "brute";
+            } else if (wave < 10) {
+                if (r < 0.55) t = "walker";
+                else if (r < 0.8) t = "runner";
+                else if (r < 0.95) t = "brute";
+                else t = "toxic";
+            } else {
+                if (r < 0.45) t = "walker";
+                else if (r < 0.7) t = "runner";
+                else if (r < 0.85) t = "brute";
+                else t = "toxic";
+            }
+        } else {
+            t = typeOverride;
+        }
+
+        const x = Math.random() < 0.5 ? -20 : 820;
+        const y = Math.random() * 600;
+
+        const z = this.zombies.get(x, y, t);
+        if (!z) return;
+
+        z.type = t;
+        z.setActive(true);
+        z.setVisible(true);
+    }
+
+    update(time, delta) {
+        if (this.state.isPaused) return;
+
+        if (this.player) this.player.update();
+
+        if (this.waveActive) {
+            this.spawnTimer += delta;
+            if (this.spawnTimer >= this.spawnInterval) {
+                this.spawnTimer = 0;
+
+                if (this.waveEnemyCount > 0) {
+                    this.spawnZombie();
+                    this.waveEnemyCount--;
+                }
+            }
+        }
+
+        this.zombies.children.each(z => {
+            if (!z.active) return;
+            this.physics.moveToObject(z, this.player.sprite, z.speed);
+        });
+    }
+
+    killZombie(z) {
+        this.state.kills++;
+        this.state.totalXP += z.xp;
+        this.addXP(z.xp);
+        this.waveKilled++;
+
+        if (this.waveKilled >= (20 + this.state.wave * 3)) {
+            this.nextWave();
+        }
+    }
+
+    nextWave() {
+        this.waveActive = false;
+        this.state.wave++;
+        this.time.addEvent({
+            delay: 2000,
+            callback: () => this.startWave(),
+            loop: false
+        });
+    }
+
+    addXP(amount) {
+        this.state.xp += amount;
+        if (this.state.xp >= this.state.xpToNext) {
+            this.state.xp -= this.state.xpToNext;
+            this.levelUp();
+        }
+    }
+
+    levelUp() {
+        this.state.level++;
+        this.state.xpToNext = Math.floor(this.state.xpToNext * 1.35);
+        this.state.isPaused = true;
+        this.ui.showUpgrade();
+    }
+
+    endGame() {
+        this.state.isPaused = true;
+        this.ui.showGameOver(this.state);
+    }
 }
 
-const config = {
-  type: Phaser.AUTO,
-  width: GAME_WIDTH,
-  height: GAME_HEIGHT,
-  parent: "game-container",
-  backgroundColor: "#05060b",
-  physics: {
-    default: "arcade",
-    arcade: {
-      debug: false
-    }
-  },
-  scene: [BattleScene]
-};
-
-window.addEventListener("load", () => {
-  new Phaser.Game(config);
-});
