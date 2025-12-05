@@ -1,4 +1,4 @@
-// ui.js — Полный рабочий файл UI без модулей
+// ui.js — Full working UI file, no modules
 
 class BattleUI {
     constructor() {
@@ -16,7 +16,7 @@ class BattleUI {
             this.levelUpText.style.pointerEvents = "none";
             this.levelUpText.style.zIndex = "9999";
             this.levelUpText.style.opacity = "0";
-            this.levelUpText.style.transition = "opacity 0.5s";
+            this.levelUpText.style.transition = "opacity 0.5s ease";
 
             document.body.appendChild(this.levelUpText);
         }
@@ -25,7 +25,7 @@ class BattleUI {
     }
 
     showLevelUp(level) {
-        this.levelUpText.innerHTML = "LEVEL UP! → " + level;
+        this.levelUpText.innerHTML = "LEVEL UP → " + level;
         this.levelUpText.style.opacity = "1";
 
         setTimeout(() => {
@@ -38,5 +38,4 @@ class BattleUI {
     }
 }
 
-// Делаем глобальным
 window.BattleUI = BattleUI;

@@ -1,5 +1,3 @@
-c// game.js — Полный рабочий код BattleScene
-
 class BattleScene extends Phaser.Scene {
     constructor() {
         super("BattleScene");
@@ -10,30 +8,23 @@ class BattleScene extends Phaser.Scene {
     }
 
     preload() {
-        // если есть спрайты — загрузи здесь
     }
 
     create() {
-        // создаём UI
         this.ui = new BattleUI();
 
-        // создаём тестовый квадрат игрока
         this.player = this.add.rectangle(400, 300, 40, 40, 0x00ff00);
 
-        // создаём enemy
         this.enemy = this.add.rectangle(200, 300, 40, 40);
         this.enemy.setStrokeStyle(2, 0x00ff00);
 
-        // включаем физику
         this.physics.add.existing(this.player);
         this.physics.add.existing(this.enemy);
 
-        // включаем столкновение
         this.physics.add.collider(this.player, this.enemy, () => {
             this.addXP(5);
         });
 
-        // движение игрока для теста
         this.input.on("pointermove", (p) => {
             this.player.x = p.x;
             this.player.y = p.y;
