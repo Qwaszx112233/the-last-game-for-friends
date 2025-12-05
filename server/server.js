@@ -9,34 +9,75 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Порт сервера
 const PORT = process.env.PORT || 3000;
 
-// Простые константы (чтобы не тянуть shared/constants на этом этапе)
 const PLAYER_HEALTH = 100;
+const ZOMBIE_HEALTH = 40;
+const ZOMBIE_SPEED = 1.2;
+
 const SOCKET_EVENTS = {
     PLAYER_MOVE: 'player_move',
     GAME_STATE: 'game_state',
-    PLAYER_JOINED: 'player_joined',
-    PLAYER_LEFT: 'player_left'
+    ZOMBIE_STATE: 'zombie_state'
 };
 
-// Раздаём клиентские файлы из папки client
+// ===== PLAYERS =====
+const players = {};
+
+// ===== ZOMBIES =====
+let zombies = [];
+let nextZombieId = 1;
+
+// Создаём одного зомби
+function spawnZombie() {
+    zombies.push({
+        id: nextZombieId++,
+        x: Math.random() * 2000 - 1000,
+        y: Math.random() * 2000 - 1000,
+        hp: ZOMBIE_HEALTH
+    });
+}
+
+// Двигаем каждого зомби к ближайшему игроку
+function updateZombies() {
+    zombies.forEach(z => {
+        let nearest = null;
+        let nearestDist = Infinity;
+
+        for (const id in players) {
+            const p = players[id];
+            const dx = p.x - z.x;
+            const dy = p.y - z.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < nearestDist) {
+                nearestDist = dist;
+                nearest = p;
+            }
+        }
+
+        if (nearest) {
+            const dx = nearest.x - z.x;
+            const dy = nearest.y - z.y;
+            const len = Math.sqrt(dx * dx + dy * dy);
+
+            z.x += (dx / len) * ZOMBIE_SPEED;
+            z.y += (dy / len) * ZOMBIE_SPEED;
+        }
+    });
+}
+
+// ===== SOCKET =====
+
 app.use(express.static(path.join(__dirname, '../client')));
 
-// Главная страница
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/index.html'));
 });
 
-// Список игроков в памяти сервера
-const players = {};
-
-// Подключение нового клиента
 io.on('connection', (socket) => {
     console.log('Игрок подключился:', socket.id);
 
-    // Создаём запись о новом игроке
     players[socket.id] = {
         id: socket.id,
         x: 200,
@@ -44,35 +85,32 @@ io.on('connection', (socket) => {
         hp: PLAYER_HEALTH
     };
 
-    // Сообщаем всем, что игрок присоединился
-    io.emit(SOCKET_EVENTS.PLAYER_JOINED, players[socket.id]);
-
-    // Обработка движения игрока
     socket.on(SOCKET_EVENTS.PLAYER_MOVE, (data) => {
-        const player = players[socket.id];
-        if (!player) return;
+        const p = players[socket.id];
+        if (!p) return;
 
-        if (typeof data.x === 'number') player.x = data.x;
-        if (typeof data.y === 'number') player.y = data.y;
+        if (typeof data.x === 'number') p.x = data.x;
+        if (typeof data.y === 'number') p.y = data.y;
     });
 
-    // Отключение игрока
     socket.on('disconnect', () => {
-        console.log('Игрок вышел:', socket.id);
         delete players[socket.id];
-
-        io.emit(SOCKET_EVENTS.PLAYER_LEFT, socket.id);
+        console.log("Игрок отключился:", socket.id);
     });
 });
 
-// Периодическая рассылка общего состояния игры (10 раз в секунду)
+// ===== GAME LOOP =====
+
 setInterval(() => {
-    io.emit(SOCKET_EVENTS.GAME_STATE, {
-        players
-    });
+    updateZombies();
+
+    io.emit(SOCKET_EVENTS.GAME_STATE, { players });
+    io.emit(SOCKET_EVENTS.ZOMBIE_STATE, { zombies });
 }, 100);
 
-// Запуск сервера
+// Спавн зомби каждые 3 секунды
+setInterval(() => spawnZombie(), 3000);
+
 server.listen(PORT, () => {
     console.log(`Сервер запущен: http://localhost:${PORT}`);
 });

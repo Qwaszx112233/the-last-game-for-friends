@@ -1,8 +1,8 @@
 // client/game.js
 
 const keys = {};
-window.addEventListener('keydown', (e) => keys[e.key.toLowerCase()] = true);
-window.addEventListener('keyup', (e) => keys[e.key.toLowerCase()] = false);
+window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
 
 const socket = io();
 
@@ -10,13 +10,14 @@ class MainScene {
     constructor(game) {
         this.game = game;
 
-        this.players = {};     // данные от сервера
-        this.renderPlayers = {}; // данные для отображения (интерполяция)
+        this.players = {};
+        this.renderPlayers = {};
+
+        this.zombies = {};
+        this.renderZombies = {};
 
         this.playerId = null;
         this.speed = 4;
-
-        this.onlineCounter = document.getElementById('online-count');
     }
 
     init() {
@@ -28,10 +29,8 @@ class MainScene {
         socket.on('game_state', (state) => {
             const serverPlayers = state.players || {};
 
-            // Обновляем список игроков
             for (const id in serverPlayers) {
                 const sp = serverPlayers[id];
-
                 if (!this.renderPlayers[id]) {
                     this.renderPlayers[id] = {
                         renderX: sp.x,
@@ -40,25 +39,39 @@ class MainScene {
                         serverY: sp.y
                     };
                 }
-
-                // Обновляем серверные координаты
                 this.renderPlayers[id].serverX = sp.x;
                 this.renderPlayers[id].serverY = sp.y;
             }
 
-            // Удаляем игроков, которые вышли
             for (const id in this.renderPlayers) {
                 if (!serverPlayers[id]) delete this.renderPlayers[id];
             }
 
             this.players = serverPlayers;
-            this.updateUi();
+            document.getElementById("online-count").textContent = Object.keys(this.players).length;
+        });
+
+        socket.on("zombie_state", (state) => {
+            const serverZombies = state.zombies || {};
+
+            serverZombies.forEach(z => {
+                if (!this.renderZombies[z.id]) {
+                    this.renderZombies[z.id] = {
+                        renderX: z.x,
+                        renderY: z.y,
+                        serverX: z.x,
+                        serverY: z.y
+                    };
+                }
+                this.renderZombies[z.id].serverX = z.x;
+                this.renderZombies[z.id].serverY = z.y;
+            });
+
+            this.zombies = serverZombies;
+
+            document.getElementById("zombie-count").textContent = serverZombies.length;
         });
     }
-
-    resize() {}
-
-    destroy() {}
 
     update() {
         if (!this.playerId) return;
@@ -73,88 +86,78 @@ class MainScene {
         if (keys['a'] || keys['arrowleft']) { me.x -= this.speed; moved = true; }
         if (keys['d'] || keys['arrowright']) { me.x += this.speed; moved = true; }
 
-        if (moved) {
-            socket.emit('player_move', { x: me.x, y: me.y });
-        }
+        if (moved) socket.emit("player_move", { x: me.x, y: me.y });
 
-        // Интерполяция всех игроков для гладкости
+        // Интерполяция игроков
         for (const id in this.renderPlayers) {
             const rp = this.renderPlayers[id];
-
             rp.renderX += (rp.serverX - rp.renderX) * 0.2;
             rp.renderY += (rp.serverY - rp.renderY) * 0.2;
+        }
+
+        // Интерполяция зомби
+        for (const id in this.renderZombies) {
+            const rz = this.renderZombies[id];
+            rz.renderX += (rz.serverX - rz.renderX) * 0.2;
+            rz.renderY += (rz.serverY - rz.renderY) * 0.2;
         }
     }
 
     render(ctx) {
         ctx.clearRect(0, 0, this.game.canvas.width, this.game.canvas.height);
 
+        // Игроки
         for (const id in this.renderPlayers) {
             const p = this.renderPlayers[id];
-
             ctx.fillStyle = id === this.playerId ? "lime" : "red";
             ctx.fillRect(p.renderX, p.renderY, 20, 20);
         }
-    }
 
-    updateUi() {
-        this.onlineCounter.textContent = Object.keys(this.players).length;
+        // Зомби
+        for (const id in this.renderZombies) {
+            const z = this.renderZombies[id];
+            ctx.fillStyle = "orange";
+            ctx.fillRect(z.renderX, z.renderY, 20, 20);
+        }
     }
 }
 
 class Game {
     constructor() {
-        this.canvas = document.getElementById('game-canvas');
-        this.ctx = this.canvas.getContext('2d');
-
-        this.loadingScreen = document.getElementById('loading-screen');
-        this.gameContainer = document.getElementById('game-container');
-        this.ui = document.getElementById('ui');
+        this.canvas = document.getElementById("game-canvas");
+        this.ctx = this.canvas.getContext("2d");
 
         this.scenes = {};
         this.currentScene = null;
 
-        this.init();
-    }
-
-    init() {
         this.resize();
-        window.addEventListener('resize', () => this.resize());
+        window.addEventListener("resize", () => this.resize());
 
         this.loadScenes();
         this.gameLoop();
     }
 
     resize() {
-        this.canvas.width = this.gameContainer.clientWidth;
-        this.canvas.height = this.gameContainer.clientHeight;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
     }
 
     loadScenes() {
         this.scenes["main"] = new MainScene(this);
         this.setScene("main");
-        this.hideLoadingScreen();
     }
 
     setScene(name) {
-        if (this.currentScene?.destroy) this.currentScene.destroy();
-
         this.currentScene = this.scenes[name];
         this.currentScene.init();
-
-        this.ui.classList.remove("hidden");
     }
 
     gameLoop() {
-        this.currentScene.update();
-        this.currentScene.render(this.ctx);
-
+        if (this.currentScene) {
+            this.currentScene.update();
+            this.currentScene.render(this.ctx);
+        }
         requestAnimationFrame(() => this.gameLoop());
-    }
-
-    hideLoadingScreen() {
-        this.loadingScreen.classList.add("hidden");
-        this.canvas.classList.remove("hidden");
     }
 }
 
