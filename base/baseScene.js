@@ -1,5 +1,1 @@
-window.addEventListener("DOMContentLoaded", () => {
-  loadResources();
-  loadBuildingsState();
-  initBaseUI();
-});
+// Stage1 baseScene.js
