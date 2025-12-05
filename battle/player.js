@@ -10,9 +10,10 @@ class Player {
       maxHp: PLAYER_BASE_MAX_HP
     };
 
-    this.sprite = scene.physics.add.rectangle(x, y, 26, 26, 0x00ff55);
+    this.sprite = scene.add.rectangle(x, y, 26, 26, 0x00ff55);
+    scene.physics.add.existing(this.sprite);
     this.sprite.setOrigin(0.5);
-    this.sprite.setCollideWorldBounds(true);
+    this.sprite.body.setCollideWorldBounds(true);
 
     this.lastShotAt = 0;
   }
