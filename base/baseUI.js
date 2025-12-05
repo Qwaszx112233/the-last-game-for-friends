@@ -38,6 +38,7 @@ function onBaseTick() {
   const now = Date.now();
   const changed = updateBuildingUpgrades(now);
   if (changed) {
+    renderResources();
     renderBuildingSlots();
     if (selectedBuildingId) renderPanel(selectedBuildingId);
   }
